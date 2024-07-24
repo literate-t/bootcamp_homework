@@ -6,10 +6,14 @@
 #include "mymath.h"
 
 void EventLoop() {
-	char input[48] = "";
+	char input[56] = "";
 	size_t input_size = sizeof input;
 
 	while (1) {
+		memset(answer, 0, sizeof answer);
+		answer_index = 0;
+
+		// 0으로 시작하는 입력값 검사
 		if (!Input(input, input_size)) {
 			return;
 		}
@@ -17,22 +21,28 @@ void EventLoop() {
 		size_t size = strlen(input);
 
 		char op = 0;
-		char first[24] = "", second[24] = "";
+		char first[56] = "", second[56] = "";
 		Split(input, size + 1, &op, first, second);
 
+		char result[60] = "";
 		switch (op) {
-		case '+':
+		case '+': {
 			Plus(first, second);
-			char result[52] = "";
 			MakeReverse(result, (int)sizeof result);
-			printf("> %s\n", result);
 			break;
-		case '-':
-			//printf("> %d\n", Minus(first, second));
+		}
+		case '-': {
+			char result[52] = "";
+			Minus(first, second);
+			MakeReverse(result, (int)sizeof result);
 			break;
+		}
 		default:
 			puts("Wrong input");
 		}
+
+		MakeReverse(result, (int)sizeof result);
+		printf("> %s\n", result);
 	}
 }
 

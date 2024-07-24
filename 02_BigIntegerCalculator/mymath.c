@@ -6,18 +6,34 @@
 #include "ui.h"
 #include "typedef.h"
 
+#define IN
+#define OUT
+#define INOUT
+
 char operators[] = { '+', '-' };
 const int operators_count = sizeof(operators);
 const int kOneByte = 8;
-char answer[52] = "";
+char answer[60] = "";
+int answer_index = 0;
 
 // Arithmatic
 int IsSameSign(int x, int y) {
 	return 0 <= (x ^ y);
 }
 
+int IsSameSignCh(char x, char y) {
+	if ('-' == x && '-' == y) return 1;
+	if ('-' != x && '-' != y) return 1;
+	if ('+' == x && '+' == y) return 1;
+	return 0;
+}
+
 int IsMinus(int number) {
 	return 1 & (number >> 31);
+}
+
+int IsMinusCh(char ch) {
+	return '-' == ch;
 }
 
 int MyAbs(int number) {
@@ -41,8 +57,7 @@ int MakeBeforeCarry(int number) {
 }
 
 void Push(char ch) {
-	static int index = 0;
-	answer[index++] = ch;
+	answer[answer_index++] = ch;
 }
 
 void Swap(char* a, char* b) {
@@ -60,21 +75,67 @@ void MakeReverse(char* result, int dest_size) {
 	}	
 }
 
+void RemoveZeroAndPlusFromHead(char* data) {
+	if ('-' == *data) ++data;
+	char* start = data;
+	while ('0' == *start || '+'== *start) {
+		++start;
+	}
+
+	memcpy_s(data, 56, start, 56 - (start - data));
+}
+
 void Plus(char* x, char* y) {
 	if (NULL == x || NULL == y) return;
+	if (!IsSameSignCh(*x, *y)) {
+		if (!IsMinusCh(*y)) {
+			char* temp = x;
+			x = y;
+			y = temp;
+		}
 
-	int x_len = (int)strlen(x);
-	int y_len = (int)strlen(y);
+		RemoveChar(y, 0);
+		Minus(x, y);
+		return;
+	}
 
-	int size = x_len < y_len ? y_len : x_len;
-	int less_size = x_len < y_len ? x_len : y_len;
+	char* first_ptr = x;
+	char* second_ptr = y;
+
+	RemoveZeroAndPlusFromHead(first_ptr);
+	RemoveZeroAndPlusFromHead(second_ptr);
+
+	int first_length = (int)strlen(first_ptr);
+	int second_length = (int)strlen(second_ptr);
+
+	int bigger = IsSameNumber(first_ptr, first_length, second_ptr, second_length);
+	if (SAME == bigger) {
+		Push('0');
+		return;
+	}
+
+	int size = first_length < second_length ? second_length : first_length;
+	int less_size = first_length < second_length ? first_length : second_length;
 	int carry = 0, j = less_size - 1;
 
+	char* first_ptr_original = size == first_length ? first_ptr : second_ptr;
+	char* second_ptr_original = size == first_length ? second_ptr : first_ptr;
+	first_ptr = first_ptr_original;
+	second_ptr = second_ptr_original;
+
+	int is_minus = IsMinusCh(*first_ptr);
+	if (is_minus) {
+		++first_ptr;
+		++second_ptr;
+		--size;
+		--j;
+	}
+
 	for (int i = size - 1; 0 <= i; --i) {
-		int first = MyAtoI(x[i]);
+		int first = MyAtoI(first_ptr[i]);
 		int second = 0;
 		if (0 <= j) {
-			second = MyAtoI(y[j--]);
+			second = MyAtoI(second_ptr[j--]);
 		}
 
 		int result = first + second + carry;
@@ -84,12 +145,160 @@ void Plus(char* x, char* y) {
 		Push(MyItoA(result));
 	}
 
-	// 둘이 부호가 다르면 사실상 마이너스
-	// 둘이 음수이면 양수 덧셈 이후에 마이너스 부호를 붙인다
+	if (IsMinusCh(*x)) {
+		Push('-');
+	}
+}
+/*
+* 1. 절대값 계산
+* 2. (큰 길이의 값) - (작은 길이의 값)
+* 3. 마이너스 부호 위치 판별해 결과 값에 붙이기
+*/
+void Minus(char* x, char* y) {
+	if (NULL == x || NULL == y) return;
+	if (!IsSameSignCh(*x, *y)) {
+		if (IsMinusCh(*y)) {
+			RemoveChar(y, 0);
+		}
+		else {			
+			AddMinusCh(y, 0);
+		}
+		Plus(x, y);
+		return;
+	}
+
+	char* first_ptr = x;
+	char* second_ptr = y;
+
+	RemoveZeroAndPlusFromHead(first_ptr);
+	RemoveZeroAndPlusFromHead(second_ptr);
+
+	int first_length = (int)strlen(first_ptr);
+	int second_length = (int)strlen(second_ptr);
+
+	int bigger = IsSameNumber(first_ptr, first_length, second_ptr, second_length);
+	if (SAME == bigger) {
+		Push('0');
+		return;
+	}
+
+	int size = first_length < second_length ? second_length : first_length;
+	int less_size = first_length < second_length ? first_length : second_length;
+	int borrow = 0, j = less_size - 1;
+
+	char* first_ptr_original = size == first_length ? first_ptr : second_ptr;
+	char* second_ptr_original = size == first_length ? second_ptr : first_ptr;
+	first_ptr = first_ptr_original;
+	second_ptr = second_ptr_original;
+
+	int is_minus = IsMinusCh(*first_ptr);
+	if (is_minus) {
+		++first_ptr;
+		++second_ptr;
+		--size;
+		--j;
+	}
+
+	for (int i = size - 1; 0 <= i; --i) {
+		int first = MyAtoI(first_ptr[i]);
+		int second = 0;
+
+		if (0 <= j) {
+			second = MyAtoI(second_ptr[j--]);
+		}
+
+		if (first < second) {
+			borrow = 1;
+			char* start = &first_ptr[i - 1];
+
+			while (1) {
+				if ('0' == *start) {
+					*start = '9';
+					--start;
+				}
+				else {
+					int new_number = MyAtoI(*start) - 1;
+					*start = MyItoA(new_number);
+					break;
+				}
+			}
+		}
+
+		int result = first + (borrow * 10) - second;
+		borrow = 0;
+
+		Push(MyItoA(result));
+	}
+
+	if (IsMinusCh(*first_ptr_original) && FIRST_BIG == bigger) {
+		Push('-');
+	}
+	else if (!IsMinusCh(*first_ptr_original) && SECOND_BIG == bigger) {
+		Push('-');
+	}
 }
 
-int Minus(char* x, char* y) {
-	return 0;
+int IsSameNumber(char* x, int x_len, char* y, int y_len) {
+	if (x_len == y_len) {
+		char* first = x;
+		char* second = y;
+		int is_first_bigger = 0;
+		int is_second_bigger = 0;
+		int count = 0;
+
+		while ('\0' != *first) {
+			++count;
+			if (*second < *first) {
+				is_first_bigger = 1;
+				return FIRST_BIG;
+			}
+			else if (*first < *second) {
+				is_second_bigger = 1;
+				return SECOND_BIG;
+			}
+
+			++first;
+			++second;
+		}
+
+		if (x_len == count) {
+			return SAME;
+		}
+	}
+	else if (y_len < x_len) {
+		return FIRST_BIG;
+	}
+	
+	return SECOND_BIG;
+}
+
+void RemoveChar(char* data, int position) {
+	int size = (int)strlen(data);
+	for (int i = position; i < size; ++i) {
+		data[i] = data[i + 1];
+	}
+}
+
+void AddMinusCh(char* data, int position) {
+	if ('+' == *data) {
+		*data = '-';
+		return;
+	}
+
+	int size = (int)strlen(data);
+	for (int i = size; position <= i ; --i) {
+		data[i + 1] = data[i];
+	}
+
+	data[position] = '-';
+}
+
+int MakeZeroToTen(int i) {
+	return 0 == i ? 10 : i;
+}
+
+void MakeBothSize(INOUT int* size, INOUT int* less_size) {
+
 }
 
 // Arithmatic Logic

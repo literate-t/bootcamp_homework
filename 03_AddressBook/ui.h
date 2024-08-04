@@ -1,7 +1,6 @@
 #pragma once
 
-struct USERDATA;
-struct NODE;
+#include "data_struct.h"
 
 typedef enum MENU { EXIT, NEW, SORT, SEARCH, SEARCH_RANGE, PRINT, REVERSE_PRINT, REMOVE, END } MENU;
 

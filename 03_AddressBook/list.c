@@ -9,8 +9,8 @@
 USERDATA head_node = { -1, "{Head}", "{}" };
 USERDATA tail_node = { -1, "{Tail}", "{}" };
 
-NODE g_head_node = { false, NULL, &head_node, 0, 0};
-NODE g_tail_node = { false, NULL, &tail_node, 0, 0 };
+NODE g_head_node = { false, false, false, NULL, &head_node, 0, 0, NULL, NULL};
+NODE g_tail_node = { false, false, false, NULL, &tail_node, 0, 0, NULL, NULL};
 int data_count = 0;
 NODE** g_age_index_ptr = NULL;
 
@@ -58,7 +58,7 @@ void InitList()
 	g_tail_node.prev_ptr = &g_head_node;
 	InitIndices();
 	InitCount();
-	InitData();
+	//InitData();
 }
 
 void InitIndices() 
@@ -69,16 +69,16 @@ void InitIndices()
 void InitData() 
 {
 	//for (int i = 0; i < 200000; ++i) {
-		AddNewNodeAtTail(10, "Kim", "010-1111");
-		AddNewNodeAtTail(12, "Cho", "010-5555");
-		AddNewNodeAtTail(13, "Sung", "010-6666");
-		AddNewNodeAtTail(14, "Jung", "010-9999");
-		AddNewNodeAtTail(15, "Pi", "010-1010");
-		AddNewNodeAtTail(13, "Yoon", "010-7777");
-		AddNewNodeAtTail(14, "Kwak", "010-8888");
-		AddNewNodeAtTail(10, "Lee", "010-2222");
-		AddNewNodeAtTail(11, "Park", "010-3333");
-		AddNewNodeAtTail(11, "Choi", "010-4444");
+	//	AddNewNodeAtTail(10, "Kim", "010-1111");
+	//	AddNewNodeAtTail(12, "Cho", "010-5555");
+	//	AddNewNodeAtTail(13, "Sung", "010-6666");
+	//	AddNewNodeAtTail(14, "Jung", "010-9999");
+	//	AddNewNodeAtTail(15, "Pi", "010-1010");
+	//	AddNewNodeAtTail(13, "Yoon", "010-7777");
+	//	AddNewNodeAtTail(14, "Kwak", "010-8888");
+	//	AddNewNodeAtTail(10, "Lee", "010-2222");
+	//	AddNewNodeAtTail(11, "Park", "010-3333");
+	//	AddNewNodeAtTail(11, "Choi", "010-4444");
 	//}
 }
 
@@ -117,8 +117,16 @@ void Push(USERDATA* new_data)
 
 	memcpy_s(new_data_ptr, sizeof(USERDATA), new_data, sizeof(USERDATA));
 
-	NODE* original_first_node = g_head_node.next_ptr;
+	new_node_ptr->next_ptr = NULL;
+	new_node_ptr->prev_ptr = NULL;
+	new_node_ptr->data_size = 0;
+	new_node_ptr->offset = 0;
+	new_node_ptr->is_new = true;
+	new_node_ptr->is_modified = false;
+	new_node_ptr->is_deleted = false;
+	new_node_ptr->data_cache = new_data_ptr;
 
+	NODE* original_first_node = g_head_node.next_ptr;
 
 	new_node_ptr->prev_ptr = &g_head_node;
 	new_node_ptr->next_ptr = original_first_node;
@@ -126,7 +134,6 @@ void Push(USERDATA* new_data)
 
 	original_first_node = new_node_ptr;
 
-	new_node_ptr->data_cache = new_data_ptr;
 
 	IncreaseCount();
 
@@ -160,6 +167,8 @@ void AddNewNodeAtTail(int age, const char* name, const char* phone)
 	new_node_ptr->data_size = 0;
 	new_node_ptr->offset = 0;
 	new_node_ptr->is_new = true;
+	new_node_ptr->is_modified = false;
+	new_node_ptr->is_deleted = false;
 
 	NODE* original_last_node = g_tail_node.prev_ptr;
 	new_node_ptr->prev_ptr = original_last_node;
@@ -524,4 +533,67 @@ int SearchByLastOfAgeIndex(int age, int data_size)
 	}
 
 	return -1;
+}
+
+char* Parser(char* sql)
+{
+
+}
+
+
+int Query(char* sql)
+{
+	// select all
+	// select where name='kim'
+	// delete where name='kim'
+	// update where name='kim'
+}
+
+char** SplitString(char* string, int* size, char delim)
+{
+	int delim_count = 0;
+	char* end = string;
+	while ('\0' != *end)
+	{
+		if (delim == *end && delim != *(end + 1)) ++delim_count;
+
+		++end;
+	}
+	*size = delim_count + 1;
+	char** string_array = (char**)malloc(sizeof(char*) * (delim_count + 1));
+	if (NULL == string_array) return NULL;
+
+	char* start = string;
+	end = string;
+	int index = 0;
+	while (true)
+	{
+		if ((delim == *end && delim != *(end + 1)) || '\0' == *end)
+		{
+			int dist = (int)(end - start);
+
+			char* token = (char*)malloc(sizeof(char) * (dist + 1));
+			if (NULL == token) return NULL;
+
+			memcpy_s(token, dist, start, dist);
+			string_array[index] = token;
+			token[dist] = '\0';
+
+			start = end + 1;
+			++index;
+		}
+
+		if ('\0' == *end) break;
+
+		++end;
+	}
+
+	return string_array;
+}
+
+void FreeSplitString(char** string, int size)
+{
+	for (int i = 0; i < size; ++i)
+		free(string[i]);
+	free(string);
 }

@@ -43,14 +43,14 @@ MENU PrintMenu()
 
 	do {
 		system("cls");
-		puts("[1]New [2]Sort [3]Search [4]Search range [5]Print [6]Print reverse [7]Remove [0]Exit");
+		puts("[1]Input Query [2]Commit [3]Rollback [4]Exit");
 		printf("Input the number: ");
 		scanf_s("%d", &input);
 		ClearBuffer();
-	} while (END <= input);
+	} while (!(0 < input && input <= END));
 
 
-	return input;
+	return input - 1;
 }
 
 void Pause() 
@@ -126,40 +126,41 @@ void Remove()
 	DeleteByName(name);
 }
 
+void InputQuery()
+{
+	puts("Query");
+	char sql[256];
+	printf("> ");
+	scanf_s("%s", sql, (int)sizeof sql);
+
+	Query(sql);
+}
+
+void InputCommit()
+{
+	puts("Commit");
+}
+
+void InputRollback()
+{
+	puts("Rolback");
+}
+
+void (*Inputs[END])() = { InputQuery, InputCommit, InputRollback };
+
 void EventLoopRun() 
 {
 	MENU menu;
 
-	while ((menu = PrintMenu()) < END) {
-		switch (menu) {
-		case EXIT:
+	while ((menu = PrintMenu()) < END && 0 <= menu) {
+		
+		if (EXIT == menu)
+		{
 			puts("Bye!");
 			return;
-		case NEW:
-			JoinMember();
-			break;
-		case SORT:
-			Sort(&g_head_node.next_ptr);
-			break;
-		case SEARCH:
-			Search();
-			break;
-		case SEARCH_RANGE:
-			// sort first, search later			
-			SearchRange();
-			break;
-		case PRINT:
-			PrintList(false);
-			break;
-		case REVERSE_PRINT:
-			PrintList(true);
-			break;
-		case REMOVE:
-			Remove();
-			break;
-		default:			
-			break;
 		}
+
+		Inputs[menu]();
 
 		Pause();
 	}

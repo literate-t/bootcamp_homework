@@ -10,6 +10,9 @@ typedef struct USERDATA {
 typedef struct NODE
 {
 	bool is_new;
+	bool is_modified;
+	bool is_deleted;
+
 	char* key;
 	void* data_cache;       // USERDATA*
 	unsigned int data_size; // sizeof USERDATA

@@ -69,3 +69,7 @@ void MergeSort(NODE** headRef);
 // Quick sort
 void Swap(NODE** first, NODE** second);
 void QuickSortByAge(NODE** start_node, int low_index, int high_index);
+
+int Query(char* sql);
+char** SplitString(char* string, int* size, char delim);
+void FreeSplitString(char** string, int size);

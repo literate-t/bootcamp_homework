@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="data_struct.h" />
     <ClInclude Include="list.h" />
     <ClInclude Include="ui.h" />
   </ItemGroup>

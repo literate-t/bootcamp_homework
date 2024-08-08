@@ -6,25 +6,9 @@
 #include <string.h>
 #include <conio.h>
 #include <stdbool.h>
+#include <time.h>
 
 const char* const message[] = {"나이를 입력하세요: ", "이름을 입력하세요: ", "전화 번호를 입력하세요: " };
-
-void PrintList(bool reverse) 
-{
-	NODE* start_ptr = reverse ? &g_tail_node : &g_head_node;
-	if (NULL == start_ptr) 
-	{
-		puts("데이터가 없습니다.\n");
-		return;
-	}
-
-	while (start_ptr != NULL) 
-	{
-		PrintItem(start_ptr);
-		start_ptr = reverse ? start_ptr->prev_ptr : start_ptr->next_ptr;
-	}
-	puts("End of list");
-}
 
 void PrintItem(NODE* data_node) 
 {
@@ -63,90 +47,58 @@ void ClearBuffer()
 	while (getchar() != '\n') {}
 }
 
-void JoinMember() 
-{
-	int age;
-	char name[32];
-	char phone[32];
-
-	printf("%s", message[0]);
-	scanf_s("%d%*c", &age);
-	printf("%s", message[1]);
-	scanf_s("%s", name, (unsigned)_countof(name));
-	printf("%s", message[2]);
-	scanf_s("%s", phone, (unsigned)_countof(phone));
-	
-	USERDATA new_user = {0};
-	new_user.age = age;
-	memcpy_s(new_user.name, sizeof(new_user.name), name, sizeof(name));
-	memcpy_s(new_user.phone, sizeof(new_user.phone), phone, sizeof(phone));
-
-	Enqueue(&new_user);
-}
-
-void InputName(char* name, unsigned int size) 
-{
-	printf("name: ");
-	scanf_s("%s", name, size);
-}
-
-void Search() 
-{
-	char name[32] = {0};
-	InputName(name, sizeof(name));
-	NODE* find_node = SearchByName(name);
-	printf("found: ");
-	PrintItem(find_node);
-}
-
-void SearchRange() 
-{
-	int minimum_age, maximum_age;
-	printf("Input age range> ");
-	scanf_s("%d%d", &minimum_age, &maximum_age);
-
-	int size = 0;
-	USERDATA** result = SearchRangeByAgeIndex(minimum_age, maximum_age, &size);
-	if (NULL == result) {
-		puts("No result");
-	} 
-	else {
-		for (int i = 0; i < size; ++i) {
-			printf("name: %s\tage: %d\n", result[i]->name, result[i]->age);
-		}
-
-		free(result);
-	}
-}
-
-void Remove() 
-{
-	char name[32] = {0};
-	InputName(name, sizeof(name));
-	DeleteByName(name);
-}
-
 void InputQuery()
 {
-	puts("Query");
-	char sql[256];
-	printf("> ");
-	scanf_s("%s", sql, (int)sizeof sql);
+	char buffer[256];
+	int buffer_size = sizeof buffer;
+	printf("Query> ");
+	fgets(buffer, buffer_size, stdin);
 
-	Query(sql);
+	struct timespec start, end;
+	double elapsed_ms;
+
+	int size = 0;
+	timespec_get(&start, TIME_UTC);
+	USERDATA** query_result = Query(buffer, &size);
+	timespec_get(&end, TIME_UTC);
+	elapsed_ms = (end.tv_sec - start.tv_sec) * 1000.0;
+	elapsed_ms += (end.tv_nsec - start.tv_nsec) / 1000000.0;
+	printf("Elapsed time: %f ms\n", elapsed_ms);
+
+	if (NULL == query_result)
+	{
+		puts("No data");
+	}
+	else
+	{
+		printf("data size: %d\n", size);
+		for (int i = 0; i < size; ++i)
+		{
+			PrintUser(query_result[i]);
+		}
+	}
+
+	FreeQueryResult(query_result);
 }
 
 void InputCommit()
 {
-	puts("Commit");
+	puts("Commit!");
+	Commit();
 }
 
 void InputRollback()
 {
-	puts("Rolback");
+	puts("Rolback!");
+	ReleaseNodeList();
 }
 
 void (*Inputs[END])() = { InputQuery, InputCommit, InputRollback };
+
+void PrintUser(USERDATA* user_data)
+{
+	printf("%s %d세 %s %s\n", user_data->name, user_data->age, user_data->address,  user_data->phone);
+}
 
 void EventLoopRun() 
 {
@@ -161,7 +113,6 @@ void EventLoopRun()
 		}
 
 		Inputs[menu]();
-
 		Pause();
 	}
 }

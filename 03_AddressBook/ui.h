@@ -5,13 +5,10 @@
 //typedef enum MENU { EXIT, NEW, SORT, SEARCH, SEARCH_RANGE, PRINT, REVERSE_PRINT, REMOVE, END } MENU;
 typedef enum MENU { QUERY, COMMIT, ROLLBACK, EXIT, END } MENU;
 
-void PrintList(bool);
+void PrintUser(USERDATA* user_data);
 void PrintItem(NODE*);
 MENU PrintMenu();
 void ClearBuffer();
-void InputName(char* name, unsigned int size);
-void JoinMember();
-void SearchRange();
 void Pause();
 extern const char* const message[3];
 

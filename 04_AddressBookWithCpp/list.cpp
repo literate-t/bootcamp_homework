@@ -1,10 +1,9 @@
 #include "list.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <conio.h>
-#include <stdbool.h>
 
 constexpr int AGE_INIT_VALUE = -1;
 
@@ -333,7 +332,7 @@ NODE* SearchByLastOfAge(int age)
 	bool is_same_age = false;
 
 	while (nullptr != find_node) {
-		USERDATA* find = (USERDATA*)(find_node->data_cache);
+		USERDATA* find = static_cast<USERDATA*>(find_node->data_cache);
 		if (!is_same_age && age == find->age) {
 			is_same_age = true;
 		}
@@ -448,8 +447,8 @@ NODE* Merge(NODE* first_node, NODE* second_node)
 	int count = 0;
 
 	while (first_node && second_node) {
-		USERDATA* first = (USERDATA*)(first_node->data_cache);
-		USERDATA* second = (USERDATA*)(second_node->data_cache);
+		USERDATA* first = static_cast<USERDATA*>(first_node->data_cache);
+		USERDATA* second = static_cast<USERDATA*>(second_node->data_cache);
 
 		if (first->age <= second->age) {
 			result->next_ptr = first_node;
@@ -528,8 +527,8 @@ void QuickSortByAge(NODE** data_array, int low_index, int high_index)
 	// j인덱스는 마치 첨병처럼 pivot보다 작은 수를 찾고
 	// i인덱스는 swap할 위치
 	for (; j < high_index; ++j) {
-		USERDATA* data = (USERDATA*)(data_array[i]->data_cache);
-		USERDATA* pivot = (USERDATA*)((*pivot_ptr)->data_cache);
+		USERDATA* data = static_cast<USERDATA*>(data_array[i]->data_cache);
+		USERDATA* pivot = static_cast<USERDATA*>((*pivot_ptr)->data_cache);
 
 		if (data->age < pivot->age) {
 			Swap(&data_array[i++], &data_array[j]);
@@ -607,7 +606,7 @@ int SearchByFirstOfAgeIndex(int age, int data_size)
 	NODE** node_ptr = g_age_index_ptr;
 	int i = 0;
 	for (; i < data_size; ++i) {
-		USERDATA* data = (USERDATA*)(node_ptr[i]->data_cache);
+		USERDATA* data = static_cast<USERDATA*>(node_ptr[i]->data_cache);
 		if (age == data->age) {
 			return i;
 		}
@@ -622,7 +621,7 @@ int SearchByLastOfAgeIndex(int age, int data_size)
 
 	int i = data_size - 1;
 	for (; 0 <= i; --i) {
-		USERDATA* data = (USERDATA*)(node_ptr[i]->data_cache);
+		USERDATA* data = static_cast<USERDATA*>(node_ptr[i]->data_cache);
 		if (age == data->age) {
 			return i;
 		}
@@ -977,11 +976,11 @@ USERDATA** InsertByQuery(const char* name, const char* address, const char* phon
 	SetUserData(&insert_data, name, address, phone, age);
 
 	USERDATA* new_user = AddNewNodeAtTail(true, insert_data.name, insert_data.age, insert_data.address, insert_data.phone, AGE_INIT_VALUE);
-	USERDATA** result_list = new USERDATA*;
+	USERDATA** result_list = new USERDATA*[1];
 
 	if (nullptr == result_list) return nullptr;
 
-	*result_list = new_user;
+	result_list[0] = new_user;
 	*out_size = 1;
 
 	return result_list;

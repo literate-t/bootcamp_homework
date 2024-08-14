@@ -1,12 +1,10 @@
 #include "ui.h"
 #include "list.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <conio.h>
-#include <stdbool.h>
-#include <time.h>
 
 const char* const message[] = {"나이를 입력하세요: ", "이름을 입력하세요: ", "전화 번호를 입력하세요: " };
 
@@ -16,7 +14,7 @@ void PrintItem(NODE* data_node)
 		return;
 	}
 
-	USERDATA* data = (USERDATA*)(data_node->data_cache);
+	USERDATA* data = static_cast<USERDATA*>(data_node->data_cache);
 	printf("[prev: %p]\t[me: %p] %d, %s\t\t[next: %p]\n",
 		data_node->prev_ptr, data, data->age, data->name, data_node->next_ptr);
 }

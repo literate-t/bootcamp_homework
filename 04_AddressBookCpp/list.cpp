@@ -12,92 +12,9 @@ constexpr int AGE_INIT_VALUE = -1;
 USERDATA head_node = { "{Head}", AGE_INIT_VALUE, "", ""};
 USERDATA tail_node = { "{Tail}", 999, "", ""};
 
-
 NODE g_head_node = { false, false, false, nullptr, &head_node, 0, 0, nullptr, nullptr};
 NODE g_tail_node = { false, false, false, nullptr, &tail_node, 0, 0, nullptr, nullptr};
 int data_count = 0;
-NODE** g_age_index_ptr = nullptr;
-
-void DeleteByName(const char* name) 
-{
-	//NODE* remove_node = FindUserFromFileByName(name);
-	//RemoveNode(remove_node);
-}
-
-USERDATA** FindUserFromFileByName(const char* name)
-{
-	FILE* fp = nullptr;
-	fopen_s(&fp, "user_address.dat", "rb");
-	if (nullptr == fp)
-	{
-		puts("file open failure");
-		return nullptr;
-	}
-
-	USERDATA user_data;
-	int offset = 0;
-	int data_count = 0;
-	while (0 < fread(&user_data, sizeof(USERDATA), 1, fp))
-	{
-		if (0 == strcmp(user_data.name, name))
-		{
-			AddNewNodeAtTail(false, user_data.name, user_data.age, user_data.address, user_data.phone, offset);
-			++data_count;
-		}
-
-		++offset;
-	}
-	fclose(fp);
-
-	if (0 == data_count) return nullptr;
-
-	USERDATA** result_list = FindUserFromListByName(name);
-
-	return result_list;
-}
-
-int CountFromListByName(const char* name)
-{
-	int count = 0;
-	NODE* find = g_head_node.next_ptr;
-
-	while (find)
-	{
-		USERDATA* user = static_cast<USERDATA*>(find->data_cache);
-		if (0 == strcmp(user->name, name)) ++count;
-
-		find = find->next_ptr;
-	}
-
-	return count;
-}
-
-void SetArrayFromListByName(USERDATA** user_data_ptr, const char* name)
-{
-	NODE* find = g_head_node.next_ptr;
-	int index = 0;
-	while (find)
-	{
-		USERDATA* user = static_cast<USERDATA*>(find->data_cache);
-		if (0 == strcmp(user->name, name))
-			user_data_ptr[index++] = user;
-
-		find = find->next_ptr;
-	}
-}
-
-USERDATA** FindUserFromListByName(const char* name)
-{
-	int count = CountFromListByName(name);
-	if (0 == count) return nullptr;
-
-	USERDATA** user_result_list = new USERDATA * [count];
-	if (nullptr == user_result_list) return nullptr;
-
-	SetArrayFromListByName(user_result_list, name);
-
-	return user_result_list;
-}
 
 void RemoveNode(NODE* remove_node) 
 {
@@ -111,38 +28,13 @@ void RemoveNode(NODE* remove_node)
 	delete remove_node;
 
 	DecreaseCount();
-
-	UpdateIndexByAge();
 }
 
 void InitList()
 {
 	g_head_node.next_ptr = &g_tail_node;
 	g_tail_node.prev_ptr = &g_head_node;
-	//InitIndices();
 	InitCount();
-	//InitData();
-}
-
-void InitIndices() 
-{
-	ReleaseIndex();
-}
-
-void InitData() 
-{
-	//for (int i = 0; i < 200000; ++i) {
-	//	AddNewNodeAtTail(10, "Kim", "010-1111");
-	//	AddNewNodeAtTail(12, "Cho", "010-5555");
-	//	AddNewNodeAtTail(13, "Sung", "010-6666");
-	//	AddNewNodeAtTail(14, "Jung", "010-9999");
-	//	AddNewNodeAtTail(15, "Pi", "010-1010");
-	//	AddNewNodeAtTail(13, "Yoon", "010-7777");
-	//	AddNewNodeAtTail(14, "Kwak", "010-8888");
-	//	AddNewNodeAtTail(10, "Lee", "010-2222");
-	//	AddNewNodeAtTail(11, "Park", "010-3333");
-	//	AddNewNodeAtTail(11, "Choi", "010-4444");
-	//}
 }
 
 void IncreaseCount() 
@@ -163,11 +55,6 @@ void DecreaseCount()
 void InitCount()
 {
 	data_count = 0;
-}
-
-int GetDataCount()
-{
-	return data_count;
 }
 
 void Push(bool is_new, USERDATA* new_data)
@@ -197,19 +84,7 @@ void Push(bool is_new, USERDATA* new_data)
 
 	original_first_node = new_node_ptr;
 
-
 	IncreaseCount();
-
-	//UpdateIndexByAge();
-}
-
-void Enqueue(USERDATA* data)
-{
-	//if (nullptr == data) {
-	//	return;
-	//}
-
-	//AddNewNodeAtTail(data->age, data->name, data->phone);
 }
 
 bool IsAllDataEmpty(const char* name, int age, const char* address, const char* phone)
@@ -257,8 +132,6 @@ USERDATA* AddNewNodeAtTail(bool is_new, const char* name, int age, const char* a
 
 	IncreaseCount();
 
-	UpdateIndexByAge();
-
 	return new_data_ptr;
 }
 
@@ -280,8 +153,6 @@ NODE* Pop()
 
 	DecreaseCount();
 
-	UpdateIndexByAge();
-
 	return pop_data;
 }
 
@@ -290,119 +161,12 @@ bool IsEmpty()
 	return g_head_node.next_ptr == &g_tail_node;
 }
 
-USERDATA** SearchByName(const char* name, int* count)
-{
-	USERDATA** result_list = FindUserFromListByName(name);
-	if (nullptr == result_list)
-	{
-		result_list = FindUserFromFileByName(name);
-	}
-
-	*count = CountFromListByName(name);
-
-	return result_list;
-}
-
 void FreeQueryResult(USERDATA** result_list)
 {
 	// 연결 리스트 데이터는 이벤트 루프 끝나고 별도로 해지하는 로직이 있고
 	// 여기에서는 연결 리스트에 존재하는 데이터 주소를 동적 배열 요소에 단순 복사한 거기 때문에
 	// 동적 배열로 생성한 부분만 해제한다
 	delete[] result_list;
-}
-
-NODE* SearchByFirstOfAge(int age)
-{
-	NODE* find_node = g_head_node.next_ptr;
-	while (nullptr != find_node) {
-		USERDATA* find = (USERDATA*)(find_node->data_cache);
-		if (age == find->age) {
-			return find_node;
-		}
-
-		find_node = find_node->next_ptr;
-	}
-
-	return nullptr;
-}
-
-NODE* SearchByLastOfAge(int age)
-{
-	NODE* find_node = g_head_node.next_ptr;
-	bool is_same_age = false;
-
-	while (nullptr != find_node) {
-		USERDATA* find = static_cast<USERDATA*>(find_node->data_cache);
-		if (!is_same_age && age == find->age) {
-			is_same_age = true;
-		}
-		else if (is_same_age && age != find->age) {
-			is_same_age = false;
-			return find_node->prev_ptr;
-		}
-
-		find_node = find_node->next_ptr;
-	}
-
-	return nullptr;
-}
-
-int GetCountBetween(NODE* start, NODE* end)
-{
-	int count = 1;
-	while (nullptr != start) {
-		if (start == end) {
-			return count;
-		}
-
-		++count;
-		start = start->next_ptr;
-	}
-
-	return count;
-}
-
-NODE** MemoryCopy(NODE** dest, int dest_size, NODE* start)
-{
-	for (int i = 0; i < dest_size; ++i) {
-		if (nullptr == start) {
-			delete dest;
-			return nullptr;
-		}
-
-		dest[i] = start;
-		start = start->next_ptr;
-	}
-
-	return dest;
-}
-
-NODE** SearchRangeByAge(int minimum_age, int maximum_age, int* array_size)
-{
-
-	NODE* first = SearchByFirstOfAge(minimum_age);
-	NODE* last = SearchByLastOfAge(maximum_age);
-
-	while (first == nullptr) first = SearchByFirstOfAge(++minimum_age);
-	while (last == nullptr) last = SearchByLastOfAge(--maximum_age);
-
-	int size = GetCountBetween(first, last);
-	NODE** result = 0 != size ? new NODE * [size] : nullptr;
-	if (nullptr == result) return nullptr;
-
-	*array_size = size;
-
-	result = MemoryCopy(result, size, first);
-	if (nullptr == result) {
-		*array_size = 0;
-	}
-
-	return result;
-}
-
-void Sort(NODE** start_node_ptr)
-{
-	MergeSort(start_node_ptr);
 }
 
 void ReleaseNodeList()
@@ -417,217 +181,6 @@ void ReleaseNodeList()
 	}
 
 	InitList();
-}
-
-void ReleaseIndex()
-{
-	delete[] g_age_index_ptr;
-	g_age_index_ptr = nullptr;
-}
-
-//===========================================================
-// Merge sort
-void Split(NODE* source, NODE** front, NODE** back)
-{
-	NODE* slow = source, * fast = source->next_ptr;
-	while (fast && fast->next_ptr) {
-		slow = slow->next_ptr;
-		fast = fast->next_ptr->next_ptr;
-	}
-
-	*front = source; // 앞 부분 시작
-	*back = slow->next_ptr; // 뒷 부분 시작
-	slow->next_ptr = nullptr; // 연결 끊기
-}
-
-NODE* Merge(NODE* first_node, NODE* second_node)
-{
-	NODE dummy = {0};
-	NODE* result = &dummy;
-	int count = 0;
-
-	while (first_node && second_node) {
-		USERDATA* first = static_cast<USERDATA*>(first_node->data_cache);
-		USERDATA* second = static_cast<USERDATA*>(second_node->data_cache);
-
-		if (first->age <= second->age) {
-			result->next_ptr = first_node;
-			first_node = first_node->next_ptr;
-		}
-		else {
-			result->next_ptr = second_node;			
-			second_node = second_node->next_ptr;
-		}
-
-		if (&g_tail_node == result->next_ptr) break;
-
-		result->next_ptr->prev_ptr = result;
-		result = result->next_ptr;
-	}
-
-	// prev_ptr이 없을 때 남은 리스트 이어붙이기
-	//result->next_ptr = first ? first : second;
-
-	// prev_ptr이 있는 경우 남은 리스트 이어붙이기
-	NODE* rest = first_node ? first_node : second_node;
-	AppendRestNode(result, rest);	
-
-	dummy.next_ptr->prev_ptr = &g_head_node;
-
-	return dummy.next_ptr;
-}
-
-void AppendRestNode(NODE* node, NODE* rest)
-{
-	while (rest) {
-		node->next_ptr = rest;
-		node->next_ptr->prev_ptr = node;
-
-		node = node->next_ptr;
-		rest = rest->next_ptr;
-	}
-
-	if (node != &g_tail_node)
-	{
-		node->next_ptr = &g_tail_node;
-		g_tail_node.prev_ptr = node;
-	}
-}
-
-void MergeSort(NODE** headRef)
-{
-	NODE* head = *headRef;
-	if (!head ||!head->next_ptr) return;
-	if (&g_tail_node == head) return;
-
-	NODE* first, * second;
-	Split(head, &first, &second);
-
-	MergeSort(&first);
-	MergeSort(&second);
-
-	*headRef = Merge(first, second);
-}
-
-// Quick sort
-void Swap(NODE** first, NODE** second)
-{
-	NODE* temp = *first;
-	*first = *second;
-	*second = temp;
-}
-
-void QuickSortByAge(NODE** data_array, int low_index, int high_index)
-{
-	if (high_index <= low_index) return;
-
-	int i = low_index, j = low_index;
-	NODE** pivot_ptr = &data_array[high_index];
-
-	// j인덱스는 마치 첨병처럼 pivot보다 작은 수를 찾고
-	// i인덱스는 swap할 위치
-	for (; j < high_index; ++j) {
-		USERDATA* data = static_cast<USERDATA*>(data_array[i]->data_cache);
-		USERDATA* pivot = static_cast<USERDATA*>((*pivot_ptr)->data_cache);
-
-		if (data->age < pivot->age) {
-			Swap(&data_array[i++], &data_array[j]);
-		}
-	}
-	Swap(&data_array[i], pivot_ptr);
-
-	QuickSortByAge(data_array, low_index, i - 1);
-	QuickSortByAge(data_array, i + 1, high_index);
-}
-
-// index
-void MakeIndexByAge()
-{
-	int data_size = GetDataCount();
-	g_age_index_ptr = new NODE * [data_size];
-
-	if (nullptr == g_age_index_ptr) return;
-
-	ListToArray(g_head_node.next_ptr, g_age_index_ptr, data_size);
-
-	QuickSortByAge(g_age_index_ptr, 0, data_size - 1);
-}
-
-void UpdateIndexByAge()
-{
-	delete[] g_age_index_ptr;
-
-	int data_size = GetDataCount();
-	g_age_index_ptr = new NODE * [data_size];
-
-	if (nullptr == g_age_index_ptr) return;
-
-	ListToArray(g_head_node.next_ptr, g_age_index_ptr, data_size);
-
-	QuickSortByAge(g_age_index_ptr, 0, data_size - 1);
-}
-
-void ListToArray(NODE* start, NODE** array, int list_size)
-{
-	for (int i = 0; i < list_size; ++i) {
-		array[i] = start;
-		start = start->next_ptr;
-	}
-}
-
-USERDATA** SearchRangeByAgeIndex(int min, int max, int* array_size)
-{
-
-	UpdateIndexByAge();
-
-	int min_index = -1;
-	int max_index = -1;
-	int data_size = GetDataCount();
-	while (-1 == min_index) min_index = SearchByFirstOfAgeIndex(min++, data_size);
-	while (-1 == max_index) max_index = SearchByLastOfAgeIndex(max--, data_size);
-
-	int size = max_index - min_index + 1;
-	USERDATA** result = 0 != size ? new USERDATA * [size] : nullptr;
-	if (nullptr == result) return nullptr;
-
-	*array_size = size;
-
-	size_t copy_size = size * sizeof(USERDATA*);
-	memcpy_s(result, copy_size, g_age_index_ptr + min_index, copy_size);
-	if (nullptr == result) {
-		*array_size = 0;
-	}
-
-	return result;
-}
-
-int SearchByFirstOfAgeIndex(int age, int data_size)
-{
-	NODE** node_ptr = g_age_index_ptr;
-	int i = 0;
-	for (; i < data_size; ++i) {
-		USERDATA* data = static_cast<USERDATA*>(node_ptr[i]->data_cache);
-		if (age == data->age) {
-			return i;
-		}
-	}
-
-	return -1;
-}
-
-int SearchByLastOfAgeIndex(int age, int data_size)
-{
-	NODE** node_ptr = g_age_index_ptr;
-
-	int i = data_size - 1;
-	for (; 0 <= i; --i) {
-		USERDATA* data = static_cast<USERDATA*>(node_ptr[i]->data_cache);
-		if (age == data->age) {
-			return i;
-		}
-	}
-
-	return -1;
 }
 
 char* Parser(char* sql)
@@ -714,8 +267,7 @@ void ToLowerCase(char* str_ptr)
 }
 
 void ParseIntValue(char* token, int* value, int value_size)
-{
-	// age = 12
+{	
 	int size = 0;
 	char** split_result = SplitString(token, &size, '=');
 	char* last_string = GetLastString(split_result, size);
@@ -726,26 +278,6 @@ void ParseIntValue(char* token, int* value, int value_size)
 	*value = result;
 
 	FreeSplitString(split_result, size);
-}
-
-int CountFromListByAllColumn(const char* name, const char* address, const char* phone, int age)
-{
-	int count = 0;
-	NODE* find = g_head_node.next_ptr;
-
-	while (find)
-	{
-		USERDATA* user = static_cast<USERDATA*>(find->data_cache);
-		if (0 == (name ? strcmp(user->name, name) : 0)
-			&& 0 == (phone ? strcmp(user->phone, phone): 0)
-			&& user->age == (AGE_INIT_VALUE < age ? age : user->age)
-			&& Includes(user->address, address)) 
-			++count;
-
-		find = find->next_ptr;
-	}
-
-	return count;
 }
 
 bool Empty(const char* str)
@@ -1119,11 +651,6 @@ USERDATA** FindUsersFromListByDeleteData(USERDATA* delete_data, int size)
 	}
 
 	return result;
-}
-
-void InitUserData(USERDATA* data)
-{
-	
 }
 
 void SetUserData(USERDATA* data, const char* name, const char* address, const char* phone, int age)

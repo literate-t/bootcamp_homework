@@ -7,13 +7,8 @@ extern NODE g_tail_node;
 
 extern int data_count;
 
-// for index
-extern NODE** g_age_index_ptr;
-
 void InitList();
-void InitData();
 void Push(bool is_new, USERDATA*);
-void Enqueue(USERDATA*);
 USERDATA* AddNewNodeAtTail(bool is_new, const char* name, int age, const char* address, const char* phone, int offset);
 NODE* Pop();
 NODE* Dequeue();
@@ -23,60 +18,15 @@ bool IsAllDataEmpty(const char* name, int age, const char* address, const char* 
 void IncreaseCount();
 void DecreaseCount();
 void InitCount();
-int GetDataCount();
 
 void ReleaseNodeList();
 
-void SetArrayFromListByName(USERDATA** user_data_ptr, const char* name);
 void FreeQueryResult(USERDATA** result_list);
 
-//// count
-int CountFromListByName(const char* name);
-int CountFromListByAllColumn(const char* name, const char* address, const char* phone, int age);
-int GetCountBetween(NODE* start, NODE* end);
-
-//// search
-NODE* SearchByFirstOfAge(int age);
-NODE* SearchByLastOfAge(int age);
-NODE** SearchRangeByAge(int minimum_age, int maximum_age, int* array_size);
-USERDATA** SearchByName(const char* name, int* count);
-USERDATA** FindUserFromFileByName(const char* name);
-USERDATA** FindUserFromListByName(const char* name);
-
-void DeleteByName(const char*);
 void RemoveNode(NODE*);
 
 void EventLoopRun();
 bool IsEmpty();
-
-// sort
-void Sort(NODE**);
-NODE** MemoryCopy(NODE** dest, int dest_size, NODE* start);
-
-// for index
-void MakeIndexByAge();
-void UpdateIndexByAge();
-void InitIndices();
-void ReleaseIndex();
-void ListToArray(NODE* start, NODE** array, int list_size);
-USERDATA** SearchRangeByAgeIndex(int min, int max, int* array_size);
-int SearchByFirstOfAgeIndex(int age, int data_size);
-int SearchByLastOfAgeIndex(int age, int data_size);
-
-//=======================================================
-// Merge sort
-void Split(NODE* source, NODE** front, NODE** back);
-
-// 두 연결 리스트를 정렬하면서 병합하는 함수
-NODE* Merge(NODE* first, NODE* second);
-void AppendRestNode(NODE* node, NODE* rest);
-
-// 병합 정렬을 이용한 연결 리스트 정렬 함수
-void MergeSort(NODE** headRef);
-
-// Quick sort
-void Swap(NODE** first, NODE** second);
-void QuickSortByAge(NODE** start_node, int low_index, int high_index);
 
 bool Includes(const char* whole, const char* part);
 USERDATA** Query(char* sql, int *size);
@@ -116,7 +66,6 @@ void UpdateNode(NODE* tobe_updated, USERDATA* updating);
 void DeleteNode(NODE* tobe_deleted);
 
 void SetUserData(USERDATA* data, const char* name, const char* address, const char* phone, int age);
-void InitUserData(USERDATA* data);
 
 bool IsValidData(USERDATA* where, USERDATA* find);
 

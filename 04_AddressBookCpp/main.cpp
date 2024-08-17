@@ -1,11 +1,11 @@
-#include "list.h"
-#include "ui.h"
+#include "Node.h"
+#include "UserData.h"
 
 int main() {
-	InitList();
+	//InitList();
 
-	EventLoopRun();
+	//EventLoopRun();
 
-	Commit();
-	ReleaseNodeList();
+	//Commit();
+	//ReleaseNodeList();
 }

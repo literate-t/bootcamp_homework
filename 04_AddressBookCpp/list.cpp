@@ -69,7 +69,7 @@ void Push(bool is_new, USERDATA* new_data)
 
 	new_node_ptr->next_ptr = nullptr;
 	new_node_ptr->prev_ptr = nullptr;
-	new_node_ptr->data_size = 0;
+	new_node_ptr->data_size = sizeof(USERDATA);
 	new_node_ptr->offset = 0;
 	new_node_ptr->is_new = is_new;
 	new_node_ptr->is_updated = false;

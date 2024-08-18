@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "02_BigIntegerCalculator", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "03_AddressBook", "03_AddressBook\03_AddressBook.vcxproj", "{0F8E1F43-6FCA-4F5E-9282-4BFBF7498BB1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "04_AddressBookCpp", "04_AddressBookCpp\04_AddressBookCpp.vcxproj", "{982AB9B4-E443-4532-99D6-378DB4375396}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{0F8E1F43-6FCA-4F5E-9282-4BFBF7498BB1}.Release|x64.Build.0 = Release|x64
 		{0F8E1F43-6FCA-4F5E-9282-4BFBF7498BB1}.Release|x86.ActiveCfg = Release|Win32
 		{0F8E1F43-6FCA-4F5E-9282-4BFBF7498BB1}.Release|x86.Build.0 = Release|Win32
+		{982AB9B4-E443-4532-99D6-378DB4375396}.Debug|x64.ActiveCfg = Debug|x64
+		{982AB9B4-E443-4532-99D6-378DB4375396}.Debug|x64.Build.0 = Debug|x64
+		{982AB9B4-E443-4532-99D6-378DB4375396}.Debug|x86.ActiveCfg = Debug|Win32
+		{982AB9B4-E443-4532-99D6-378DB4375396}.Debug|x86.Build.0 = Debug|Win32
+		{982AB9B4-E443-4532-99D6-378DB4375396}.Release|x64.ActiveCfg = Release|x64
+		{982AB9B4-E443-4532-99D6-378DB4375396}.Release|x64.Build.0 = Release|x64
+		{982AB9B4-E443-4532-99D6-378DB4375396}.Release|x86.ActiveCfg = Release|Win32
+		{982AB9B4-E443-4532-99D6-378DB4375396}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

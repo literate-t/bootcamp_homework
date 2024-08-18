@@ -3,7 +3,7 @@
 
 class UserData {
 public:
-	UserData() = delete;
+	UserData() = delete;	
 	explicit UserData(std::string name, std::string address, std::string phone, int age);
 	~UserData() = default;
 
@@ -13,8 +13,8 @@ public:
 	int GetAge() const;
 
 private:
-	std::string name_ = nullptr;
-	std::string address_ = nullptr;
-	std::string phone_ = nullptr;
+	std::string name_;
+	std::string address_;
+	std::string phone_;
 	int age_ = -1;
 };

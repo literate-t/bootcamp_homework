@@ -1,6 +1,14 @@
 #include "Node.h"
 
 template<typename T>
+unsigned int Node<T>::user_data_size_ = 0;
+
+template<typename T>
+Node<T>::Node(std::unique_ptr<T>&& user_data)
+{
+}
+
+template<typename T>
 const T* Node<T>::GetUserData() {
 	return user_data_.get();
 }

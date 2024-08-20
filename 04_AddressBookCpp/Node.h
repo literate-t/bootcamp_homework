@@ -1,31 +1,40 @@
 #pragma once
 #include <memory>
 #include <string>
+using namespace std;
+#include "UserDataManager.h"
 
-template<typename T>
 class Node {
 public:
-	Node(std::unique_ptr<T>&& user_data);	
+	Node(unique_ptr<UserDataManager>&& user_data);
 
-	const T* GetUserData();
-	void MarkAsNew();
-	void MarkAsDelete();
-	void MarkAsUpdate();
+	UserData* GetUserData() const;
+	void MarkNewAs(bool is_new);
+	void MarkDeleteAs(bool is_deleted);
+	void MarkUpdateAs(bool is_updated);
 
 	unsigned long long GetId() const;
 	int GetOffset() const;
+	void SetOffset(int offset);
+
+	string GetName() const;
+	string GetAddress() const;
+	string GetPhone() const;
+	int GetAge() const;
+
+	bool GetIsNew() const;
+	bool GetIsUpdated() const;
+	bool GetIsDeleted() const;
 
 private:
-	bool is_new = false;
-	bool is_updated = false;
-	bool is_deleted = false;
+	bool is_new_ = false;
+	bool is_updated_ = false;
+	bool is_deleted_ = false;
+	int offset_ = 0;
 
 	// pk
-	unsigned long long id = 0;
-	// since c++ 17
-	static unsigned int user_data_size_;
-	int offset = 0;
+	unsigned long long id_ = 0;
 
 private:
-	std::unique_ptr<T> user_data_;
+	std::unique_ptr<UserDataManager> user_manager_;
 };

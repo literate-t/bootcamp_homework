@@ -1,20 +1,8 @@
 #pragma once
-#include <string>
 
-class UserData {
-public:
-	UserData() = delete;	
-	explicit UserData(std::string name, std::string address, std::string phone, int age);
-	~UserData() = default;
-
-	std::string GetName() const;
-	std::string GetAddress() const;
-	std::string GetPhone() const;
-	int GetAge() const;
-
-private:
-	std::string name_;
-	std::string address_;
-	std::string phone_;
+struct UserData {
+	char name_[32] = "";
 	int age_ = -1;
+	char address_[32]= "";
+	char phone_[32] = "";
 };

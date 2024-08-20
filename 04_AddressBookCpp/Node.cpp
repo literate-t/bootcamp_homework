@@ -1,39 +1,76 @@
 #include "Node.h"
 
-template<typename T>
-unsigned int Node<T>::user_data_size_ = 0;
-
-template<typename T>
-Node<T>::Node(std::unique_ptr<T>&& user_data)
+Node::Node(std::unique_ptr<UserDataManager>&& user_data)
 {
+	user_manager_ = make_unique<UserDataManager>(user_data->GetUserData());
 }
 
-template<typename T>
-const T* Node<T>::GetUserData() {
-	return user_data_.get();
+UserData* Node::GetUserData() const
+{
+	return user_manager_->GetUserData();
 }
 
-template<typename T>
-void Node<T>::MarkAsNew() {
-	is_new = true;
+void Node::MarkNewAs(bool is_new)
+{
+	is_new_ = is_new;
 }
 
-template<typename T>
-void Node<T>::MarkAsDelete() {
-	is_deleted = true;
+void Node::MarkDeleteAs(bool is_deleted)
+{
+	is_deleted_ = is_deleted;
 }
 
-template<typename T>
-void Node<T>::MarkAsUpdate() {
-	is_updated = true;
+void Node::MarkUpdateAs(bool is_updated)
+{
+	is_updated_ = is_updated;
 }
 
-template<typename T>
-unsigned long long Node<T>::GetId() const {
-	return id;
+unsigned long long Node::GetId() const
+{
+	return id_;
 }
 
-template<typename T>
-int Node<T>::GetOffset() const {
-	return offset;
+int Node::GetOffset() const
+{
+	return offset_;
+}
+
+void Node::SetOffset(int offset)
+{
+	offset_ = offset;
+}
+
+string Node::GetName() const
+{
+	return user_manager_->GetUserName();
+}
+
+string Node::GetAddress() const
+{
+	return user_manager_->GetUserAddress();
+}
+
+string Node::GetPhone() const
+{
+	return user_manager_->GetUserPhone();
+}
+
+int Node::GetAge() const
+{
+	return user_manager_->GetUserAge();
+}
+
+bool Node::GetIsNew() const
+{
+	return is_new_;
+}
+
+bool Node::GetIsUpdated() const
+{
+	return is_updated_;
+}
+
+bool Node::GetIsDeleted() const
+{
+	return is_deleted_;
 }

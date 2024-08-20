@@ -127,23 +127,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DataContainer.cpp" />
-    <ClCompile Include="list.cpp" />
+    <ClCompile Include="DefaultDataContainer.cpp" />
+    <ClCompile Include="FileManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Node.cpp" />
-    <ClCompile Include="ui.cpp" />
-    <ClCompile Include="UserData.cpp" />
+    <ClCompile Include="QueryParser.cpp" />
+    <ClCompile Include="UserDataManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DataContainer.h" />
-    <ClInclude Include="data_struct.h" />
-    <ClInclude Include="AbstractDataContainer.h" />
-    <ClInclude Include="list.h" />
+    <ClInclude Include="DefaultDataContainer.h" />
+    <ClInclude Include="FileManager.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Node.h" />
-    <ClInclude Include="ui.h" />
+    <ClInclude Include="QueryParser.h" />
     <ClInclude Include="UserData.h" />
+    <ClInclude Include="UserDataManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,9 +1,11 @@
+#include <memory>
+#include "DefaultDataContainer.h"
+#include "Menu.h"
+using namespace std;
 
 int main() {
-	//InitList();
+	DefaultDataContainer* data_container = DefaultDataContainer::GetInstance();
+	Menu* menu = Menu::GetInstance(data_container);
 
-	//EventLoopRun();
-
-	//Commit();
-	//ReleaseNodeList();
+	menu->Run();
 }

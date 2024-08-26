@@ -18,7 +18,7 @@ size_t FileManager::read(void* data, size_t data_size, size_t element_count)
 	return fread(data, data_size, element_count, fp_);
 }
 
-void FileManager::ProcessDeleteNode(string file_name, string mode, Node* node)
+void FileManager::ProcessDeleteNode(string file_name, Node* node)
 {
 	UserData* user = node->GetUserData();
 	fseek(fp_, node->GetOffset() * sizeof UserData, SEEK_SET);
@@ -29,7 +29,7 @@ void FileManager::ProcessDeleteNode(string file_name, string mode, Node* node)
 		printf("delete: %s %s %s\n", user->name_, user->address_, user->phone_);
 
 		FILE* fp_delete = nullptr;
-		fopen_s(&fp_delete, file_name.c_str(), mode.c_str());
+		fopen_s(&fp_delete, file_name.c_str(), "ab+");
 		if (nullptr == fp_delete) return;
 
 		int offset = node->GetOffset();
@@ -51,11 +51,11 @@ void FileManager::ProcessDeleteNode(string file_name, string mode, Node* node)
 	}
 }
 
-void FileManager::ProcessNewNode(string file_name, string mode, Node* node)
+void FileManager::ProcessNewNode(string file_name, Node* node)
 {
 	// find deleted offset
 	FILE* fp_deleted = nullptr;
-	fopen_s(&fp_deleted, file_name.c_str(), mode.c_str());
+	fopen_s(&fp_deleted, file_name.c_str(), "rb+");
 	if (nullptr == fp_deleted)
 	{
 		printf("fopen_s error: %s\n", file_name.c_str());
@@ -107,7 +107,7 @@ void FileManager::ProcessNewNode(string file_name, string mode, Node* node)
 	fclose(fp_deleted);
 }
 
-void FileManager::ProcessUpdateNode(string file_name, string mode, Node* node)
+void FileManager::ProcessUpdateNode(string file_name, Node* node)
 {
 	fseek(fp_, node->GetOffset() * sizeof UserData, SEEK_SET);
 	UserData* user = node->GetUserData();

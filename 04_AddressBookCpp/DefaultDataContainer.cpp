@@ -382,12 +382,12 @@ void DefaultDataContainer::Commit()
 		if (node->GetIsDeleted())
 		{
 			FileManager file_manager("user_address.dat", "rb+");
-			file_manager.ProcessDeleteNode("user_address_deleted.dat", "ab+", node.get());
+			file_manager.ProcessDeleteNode("user_address_deleted.dat", node.get());
 		}
 		else if (node->GetIsNew())
 		{
 			FileManager file_manager("user_address.dat", "ab+");
-			file_manager.ProcessNewNode("user_address_deleted.dat", "rb+", node.get());
+			file_manager.ProcessNewNode("user_address_deleted.dat", node.get());
 		}
 		else if (node->GetIsUpdated())
 		{
